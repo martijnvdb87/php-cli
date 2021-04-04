@@ -1,0 +1,16 @@
+{
+    "name": "martijnvdb/php-cli",
+    "description": "Command line interface library for PHP",
+    "type": "library",
+    "license": "MIT",
+    "authors": [{
+        "name": "Martijn van den Bosch",
+        "email": "martijn_van_den_bosch@hotmail.com"
+    }],
+    "require": {},
+    "autoload": {
+        "psr-4": {
+            "Martijnvdb\\PhpCli\\": "src/"
+        }
+    }
+}
