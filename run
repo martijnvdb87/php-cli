@@ -7,6 +7,7 @@ require __DIR__.'/vendor/autoload.php';
 
 use Martijnvdb\PhpCli\Cli;
 use Martijnvdb\PhpCli\Command;
+use Martijnvdb\PhpCli\Input\Text;
 
 $cli = new Cli('First CLI App', '');
 
@@ -14,27 +15,25 @@ $cli->addCommand(
     Command::default()
         ->addOption('help', 'The name that should be printed.', 'h')
         ->addAction(function($input, $output) {
-            $output->currentLine("HELP", ['blue']);
+            $output->currentLine("HELP", 'blue');
         })
 )
 ->addCommand(
     Command::new('test')
         ->addOption('name', 'The name that should be printed.', 'n')
         ->addAction(function($input, $output) {
-            $output->currentLine("red", ['red']);
+            $output->currentLine($input->name, 'red');
+            $output->newLine($input->name, 'blue');
         })
 )
 ->addCommand(
     Command::new('test:input')
         ->addAction(function($input, $output, $command) {
-            echo "What is your name? ";
-            $handle = fopen ('php://stdin', 'r');
-            $value = trim(fgets($handle));
+            $name = Text::new('What is your name?', ['black', 'bg:white']);
+            $age = Text::new('What is your age?', 'green', 'blue');
 
-            $command->setInput('name', $value);
-        })
-        ->addAction(function($input, $output, $command) {
-            $output->currentLine($input->name, ['green']);
+            $command->setInput('name', $name);
+            $command->setInput('age', $age);
         })
 );
 

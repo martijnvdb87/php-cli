@@ -11,7 +11,6 @@ class Writer {
     const COLOR_MAGENTA = 35;
     const COLOR_CYAN	= 36;
     const COLOR_WHITE	= 37;
-
     
     public function __construct() {}
 
@@ -42,29 +41,46 @@ class Writer {
         echo "\033[{$value}m";
     }
 
-    private function reset()
+    public function reset(): Writer
     {
         echo "\033[0m";
+
+        return $this;
     }
 
-    private function parseOptions($options)
+    private function parseOptions($options = [])
     {
-        $this->reset();
+        $options = is_array($options) ? $options : [$options];
 
         foreach($options as $option) {
             $option = strtoupper($option);
 
-            $value = constant('self::COLOR_' . $option);
+            if(substr($option, 0, 3) === 'BG:') {
+                $option = substr($option, 3);
+                $value = constant('self::COLOR_' . $option);
+    
+                if(empty($value)) {
+                    continue;
+                }
 
-            if(empty($value)) {
-                continue;
+                $value += 10;
+    
+                echo "\033[{$value}m";
+
+            } else {
+                $value = constant('self::COLOR_' . $option);
+    
+                if(empty($value)) {
+                    continue;
+                }
+    
+                echo "\033[{$value}m";
             }
 
-            echo "\033[{$value}m";
         }
     }
 
-    public function currentLine(string $value = '', array $options = []): Writer
+    public function currentLine(string $value = '', $options = []): Writer
     {
         $this->parseOptions($options);
         echo $value;
@@ -72,7 +88,7 @@ class Writer {
         return $this;
     }
 
-    public function newLine(string $value = '', array $options = []): Writer
+    public function newLine(string $value = '', $options = []): Writer
     {
         $this->parseOptions($options);
         echo "\n" . $value;
