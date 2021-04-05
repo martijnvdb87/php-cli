@@ -2,49 +2,49 @@
 
 namespace Martijnvdb\PhpCli;
 
+use Martijnvdb\PhpCli\Command;
+
 class Cli {
-    public function __construct() {}
+    
+    protected $name;
+    protected $version;
 
-    public function hideCursor()
+    private $commands = [];
+
+    public function __construct(string $name, string $version = '')
     {
-        echo "\033[?25l";
-        
-        return $this;
+        $this->name = $name;
+        $this->version = $version;
     }
 
-    public function showCursor()
+    public function addCommand(Command $command): Cli
     {
-        echo "\033[?25h";
-
-        return $this;
-    }
-
-    public function currentLine($value = '')
-    {
-        echo $value;
+        $this->commands[] = $command;
 
         return $this;
     }
 
-    public function newLine($value = '')
+    public function run(): void
     {
-        echo "\n" . $value;
+        global $argv;
 
-        return $this;
-    }
+        if(sizeof($argv) == 1) {
+            foreach($this->commands as $command) {
+                if($command->isDefault()) {
+                    $command->forceRun();
+                    return;
+                }
+            }
 
-    public function clearLine($value = '')
-    {
-        echo "\033[0G"; // Move to begin of line
-        echo "\033[K"; // Clear current line
+            return;
+        }
 
-        return $this;
-    }
+        foreach($this->commands as $command) {
+            if($command->run()) {
+                return;
+            }
+        }
 
-    public function sleep($seconds = 0)
-    {
-        sleep($seconds);
-
-        return $this;
+        echo "INVALID COMMAND";
     }
 }

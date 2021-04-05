@@ -6,13 +6,36 @@ if(php_sapi_name() !== 'cli') exit;
 require __DIR__.'/vendor/autoload.php';
 
 use Martijnvdb\PhpCli\Cli;
+use Martijnvdb\PhpCli\Command;
 
-$cli = new Cli();
+$cli = new Cli('First CLI App', '');
 
-$cli->currentLine("yay")
-    ->newLine("yay2")
-    ->sleep(1)
-    ->clearLine()
-    ->sleep(1)
-    ->currentLine("yay3")
-    ->showCursor();
+$cli->addCommand(
+    Command::default()
+        ->addOption('help', 'The name that should be printed.', 'h')
+        ->addAction(function($input, $output) {
+            $output->currentLine("HELP", ['blue']);
+        })
+)
+->addCommand(
+    Command::new('test')
+        ->addOption('name', 'The name that should be printed.', 'n')
+        ->addAction(function($input, $output) {
+            $output->currentLine("red", ['red']);
+        })
+)
+->addCommand(
+    Command::new('test:input')
+        ->addAction(function($input, $output, $command) {
+            echo "What is your name? ";
+            $handle = fopen ('php://stdin', 'r');
+            $value = trim(fgets($handle));
+
+            $command->setInput('name', $value);
+        })
+        ->addAction(function($input, $output, $command) {
+            $output->currentLine($input->name, ['green']);
+        })
+);
+
+$cli->run();
