@@ -28,7 +28,11 @@ class Cli {
     {
         global $argv;
 
-        if(sizeof($argv) == 1) {
+        $arguments = array_filter($argv, function($arg) {
+            return substr($arg, 0, 1) !== '-';
+        });
+
+        if(sizeof($arguments) == 1) {
             foreach($this->commands as $command) {
                 if($command->isDefault()) {
                     $command->forceRun();
