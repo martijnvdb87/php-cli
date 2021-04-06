@@ -28,24 +28,28 @@ class Cli {
     {
         global $argv;
 
-        $arguments = array_filter($argv, function($arg) {
-            return substr($arg, 0, 1) !== '-';
-        });
+        $arguments = array_filter($argv, function($arg, $index) {
+            if($index == 0) return false;
 
-        if(sizeof($arguments) == 1) {
+            return substr($arg, 0, 1) !== '-';
+        }, ARRAY_FILTER_USE_BOTH);
+
+        if(empty($arguments)) {
             foreach($this->commands as $command) {
                 if($command->isDefault()) {
                     $command->forceRun();
                     return;
                 }
             }
-
             return;
         }
 
-        foreach($this->commands as $command) {
-            if($command->run()) {
-                return;
+        foreach($arguments as $argument) {
+            foreach($this->commands as $command) {
+                if($command->hasTrigger($argument)) {
+                    $command->run();
+                    return;
+                }
             }
         }
 

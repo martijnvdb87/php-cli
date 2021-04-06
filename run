@@ -7,7 +7,7 @@ require __DIR__.'/vendor/autoload.php';
 
 use Martijnvdb\PhpCli\Cli;
 use Martijnvdb\PhpCli\Command;
-use Martijnvdb\PhpCli\Input\Text;
+use Martijnvdb\PhpCli\Input;
 
 $cli = new Cli('First CLI App', '');
 
@@ -28,12 +28,12 @@ $cli->addCommand(
 )
 ->addCommand(
     Command::new('test:input')
+        ->addOption('name', 'The name that should be printed.', 'n')
         ->addAction(function($input, $output, $command) {
-            $name = Text::new('What is your name?', ['black', 'bg:white']);
-            $age = Text::new('What is your age?', 'green', 'blue');
+            $name = $input->name ? $input->name : Input::text('What is your name?')->setLabelOption(['yellow'])->required()->run();
+            $number = Input::number('Number?')->required()->run();
 
-            $command->setInput('name', $name);
-            $command->setInput('age', $age);
+            $output->currentLine($name);
         })
 );
 

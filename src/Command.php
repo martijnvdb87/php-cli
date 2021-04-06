@@ -68,6 +68,17 @@ class Command {
     }
 
     /**
+     * Has trigger string.
+     * 
+     * @param  string $trigger
+     * @return Command
+     */
+    public function hasTrigger(string $trigger): bool
+    {
+        return in_array($trigger, $this->triggers);
+    }
+
+    /**
      * Register a new action.
      * 
      * @param  callable $action

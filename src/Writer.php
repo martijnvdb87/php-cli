@@ -14,6 +14,11 @@ class Writer {
     
     public function __construct() {}
 
+    public static function new()
+    {
+        return new self();
+    }
+
     public function hideCursor()
     {
         echo "\033[?25l";
