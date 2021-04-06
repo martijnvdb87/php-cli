@@ -27,15 +27,17 @@ class Input {
         return new self($label, 'number');
     }
 
-    public function setLabelOption(array $options = []): Input
+    public function setLabelOption($options = []): Input
     {
+        $options = is_array($options) ? $options : [$options];
         $this->label_options = $options;
 
         return $this;
     }
 
-    public function setInputOption(array $options = []): Input
+    public function setInputOption($options = []): Input
     {
+        $options = is_array($options) ? $options : [$options];
         $this->input_options = $options;
 
         return $this;

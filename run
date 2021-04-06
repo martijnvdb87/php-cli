@@ -30,7 +30,7 @@ $cli->addCommand(
     Command::new('test:input')
         ->addOption('name', 'The name that should be printed.', 'n')
         ->addAction(function($input, $output, $command) {
-            $name = $input->name ? $input->name : Input::text('What is your name?')->setLabelOption(['yellow'])->required()->run();
+            $name = $input->name ? $input->name : Input::text('What is your name?')->setLabelOption('yellow')->required()->run();
             $number = Input::number('Number?')->required()->run();
 
             $output->currentLine($name);
