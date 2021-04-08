@@ -142,7 +142,7 @@ class Command {
             if($index !== false) {
                 $this->input[$option->key] = true;
 
-                if(sizeof($argv) > $index && substr($argv[$index + 1], 0, 1) !== '-') {
+                if(sizeof($argv) > $index + 1 && substr($argv[$index + 1], 0, 1) !== '-') {
                     $this->input[$option->key] = $argv[$index + 1];
                 }
 

@@ -14,8 +14,19 @@ $cli = new Cli('First CLI App', '');
 $cli->addCommand(
     Command::default()
         ->addOption('help', 'The name that should be printed.', 'h')
+        ->addOption('version', 'The version of this application.', 'v')
         ->addAction(function($input, $output) {
-            $output->currentLine("HELP", 'blue');
+            //$output->currentLine("HELP", 'blue');
+            //$output->currentLine("sdfsdf\nsdfsdf\nxxx\nbbbdsfsdf");
+            $output->line('yay');
+            $output->lines([
+                'yay',
+                'xxx',
+            ]);
+            $output->lines([
+                'yay',
+                'xxx',
+            ]);
         })
 )
 ->addCommand(

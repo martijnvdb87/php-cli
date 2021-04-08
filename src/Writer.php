@@ -85,6 +85,21 @@ class Writer {
         }
     }
 
+    public function line(string $value = '', $options = []): Writer
+    {
+        $this->parseOptions($options);
+        echo $value . "\n";
+
+        return $this;
+    }
+
+    public function lines(array $lines = []): Writer
+    {
+        echo implode("\n", $lines) . "\n";
+
+        return $this;
+    }
+
     public function currentLine(string $value = '', $options = []): Writer
     {
         $this->parseOptions($options);
