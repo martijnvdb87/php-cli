@@ -16,8 +16,6 @@ $cli->addCommand(
         ->addOption('help', 'The name that should be printed.', 'h')
         ->addOption('version', 'The version of this application.', 'v')
         ->addAction(function($input, $output) {
-            //$output->currentLine("HELP", 'blue');
-            //$output->currentLine("sdfsdf\nsdfsdf\nxxx\nbbbdsfsdf");
             $output->line('yay');
             $output->lines([
                 'yay',
@@ -33,8 +31,8 @@ $cli->addCommand(
     Command::new('test')
         ->addOption('name', 'The name that should be printed.', 'n')
         ->addAction(function($input, $output) {
-            $output->currentLine($input->name, 'red');
-            $output->newLine($input->name, 'blue');
+            $output->line($input->name, 'red');
+            $output->line($input->name, 'blue');
         })
 )
 ->addCommand(
@@ -44,7 +42,7 @@ $cli->addCommand(
             $name = $input->name ? $input->name : Input::text('What is your name?')->setLabelOption('yellow')->required()->run();
             $number = Input::number('Number?')->required()->run();
 
-            $output->currentLine($name);
+            $output->line($name);
         })
 );
 

@@ -24,7 +24,7 @@ class Cli {
         return $this;
     }
 
-    public function run(): void
+    public function run()
     {
         global $argv;
 
@@ -38,21 +38,26 @@ class Cli {
             foreach($this->commands as $command) {
                 if($command->isDefault()) {
                     $command->forceRun();
-                    return;
+                    return $this->close();
                 }
             }
-            return;
+            return $this->close();
         }
 
         foreach($arguments as $argument) {
             foreach($this->commands as $command) {
                 if($command->hasTrigger($argument)) {
                     $command->run();
-                    return;
+                    return $this->close();
                 }
             }
         }
 
         echo "INVALID COMMAND";
+    }
+
+    private function close()
+    {
+        echo "\033[0A";
     }
 }

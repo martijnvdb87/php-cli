@@ -52,12 +52,7 @@ class Input {
 
     private function runText()
     {
-        $writer = Writer::new()
-            ->currentLine($this->label, $this->label_options)
-            ->reset()
-            ->currentLine(' ')
-            ->reset()
-            ->currentLine('', $this->input_options);
+        $writer = Writer::new()->line($this->label, $this->label_options)->reset();
         
         $handle = fopen('php://stdin', 'r');
         $value = fgets($handle);
@@ -76,12 +71,7 @@ class Input {
 
     private function runNumber()
     {
-        $writer = Writer::new()
-            ->currentLine($this->label, $this->label_options)
-            ->reset()
-            ->currentLine(' ')
-            ->reset()
-            ->currentLine('', $this->input_options);
+        $writer = Writer::new()->line($this->label, $this->label_options)->reset();
         
         $handle = fopen('php://stdin', 'r');
         $value = fgets($handle);

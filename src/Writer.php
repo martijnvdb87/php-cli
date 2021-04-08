@@ -100,22 +100,6 @@ class Writer {
         return $this;
     }
 
-    public function currentLine(string $value = '', $options = []): Writer
-    {
-        $this->parseOptions($options);
-        echo $value;
-
-        return $this;
-    }
-
-    public function newLine(string $value = '', $options = []): Writer
-    {
-        $this->parseOptions($options);
-        echo "\n" . $value;
-
-        return $this;
-    }
-
     public function clearLine($value = '')
     {
         echo "\033[0G"; // Move to begin of line
