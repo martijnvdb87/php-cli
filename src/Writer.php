@@ -3,15 +3,6 @@
 namespace Martijnvdb\PhpCli;
 
 class Writer {
-    const COLOR_BLACK	= 30;
-    const COLOR_RED	    = 31;
-    const COLOR_GREEN	= 32;
-    const COLOR_YELLOW  = 33;
-    const COLOR_BLUE	= 34;
-    const COLOR_MAGENTA = 35;
-    const COLOR_CYAN	= 36;
-    const COLOR_WHITE	= 37;
-
     private $prefix = "\033[";
     private $reset = "0m";
 
@@ -59,7 +50,7 @@ class Writer {
         return new self();
     }
 
-    private function parseTags($text)
+    private function parseTags(string $text): string
     {
         $parts = preg_split('/(\[\/?.+?\])/', $text, -1, PREG_SPLIT_DELIM_CAPTURE);
 
@@ -163,7 +154,7 @@ class Writer {
         return $this;
     }
 
-    public function clearLine($value = '')
+    public function clearLine($value = ''): Writer
     {
         echo "\033[0G"; // Move to begin of line
         echo "\033[K"; // Clear current line
@@ -171,7 +162,7 @@ class Writer {
         return $this;
     }
 
-    public function sleep($seconds = 0)
+    public function sleep($seconds = 0): Writer
     {
         sleep($seconds);
 

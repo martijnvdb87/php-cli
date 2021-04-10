@@ -6,36 +6,24 @@ if(php_sapi_name() !== 'cli') exit;
 require __DIR__.'/vendor/autoload.php';
 
 use Martijnvdb\PhpCli\Cli;
-use Martijnvdb\PhpCli\Command;
 use Martijnvdb\PhpCli\Input;
 
 $cli = new Cli('First CLI App', '');
 
-$cli->addCommand(
-    Command::default()
-        ->addOption('help', 'The name that should be printed.', 'h')
-        ->addOption('version', 'The version of this application.', 'v')
-        ->addAction(function($input, $output) {
-            $output->line('Lorem ipsum [s]dolor sit[/s] amet, consectetur adipiscing elit.');
-        })
-)
-->addCommand(
-    Command::new('test')
-        ->addOption('name', 'The name that should be printed.', 'n')
-        ->addAction(function($input, $output) {
-            $output->line($input->name);
-            $output->line($input->name);
-        })
-)
-->addCommand(
-    Command::new('test:input')
-        ->addOption('name', 'The name that should be printed.', 'n')
-        ->addAction(function($input, $output, $command) {
-            $name = $input->name ? $input->name : Input::text('[yellow]What is your name?[/yellow]')->inputStyling('red')->required()->run();
-            $number = Input::number('Number?')->required()->run();
+$cli->add(function($input, $output) {
+    if($input->get('-h', '--help')) {
+        $output->line('HELP');
+    }
 
-            $output->line($name);
-        })
-);
+    if($input->get('-v', '--version')) {
+        $output->line('VERSION');
+    }
 
-$cli->run();
+})->add('test', function($input, $output) {
+    $name = $input->get('-n', '--name');
+
+    $name = !empty($name) ? $name : Input::text('[yellow]What is your name?[/yellow]')->run();
+
+    $output->line("Lorem ipsum [bold][red]{$name}[/red][/bold] amet, consectetur adipiscing elit.");
+    
+})->run();

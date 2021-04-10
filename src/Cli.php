@@ -2,12 +2,14 @@
 
 namespace Martijnvdb\PhpCli;
 
-use Martijnvdb\PhpCli\Command;
+use Martijnvdb\PhpCli\Argument;
 
 class Cli {
     
     protected $name;
     protected $version;
+
+    const DEFAULT = '__DEFAULT__';
 
     private $commands = [];
 
@@ -17,43 +19,54 @@ class Cli {
         $this->version = $version;
     }
 
-    public function addCommand(Command $command): Cli
+    public function add(): Cli
     {
-        $this->commands[] = $command;
+        $command = self::DEFAULT;
+        $callback = null;
+
+        foreach(func_get_args() as $arg) {
+            if(is_callable($arg)) {
+                $callback = $arg;
+
+            } else if(is_string($arg)) {
+                $command = $arg;
+            }
+        }
+
+        if(isset($callback)) {
+            $this->commands[$command] = $callback;
+        }
 
         return $this;
     }
 
-    public function run()
+    public function run(): void
     {
         global $argv;
 
-        $arguments = array_filter($argv, function($arg, $index) {
-            if($index == 0) return false;
+        $command = null;
 
-            return substr($arg, 0, 1) !== '-';
-        }, ARRAY_FILTER_USE_BOTH);
-
-        if(empty($arguments)) {
-            foreach($this->commands as $command) {
-                if($command->isDefault()) {
-                    $command->forceRun();
-                    return $this->close();
-                }
+        foreach($argv as $arg) {
+            // If options are found, stop searching for the command
+            if(substr($arg, 0, 1) === '-') {
+                break;
             }
-            return $this->close();
-        }
 
-        foreach($arguments as $argument) {
-            foreach($this->commands as $command) {
-                if($command->hasTrigger($argument)) {
-                    $command->run();
-                    return $this->close();
-                }
+            if(in_array($arg, array_keys($this->commands))) {
+                $command = $arg;
+                break;
             }
         }
 
-        echo "INVALID COMMAND";
+        if(empty($command) && isset($this->commands[self::DEFAULT])) {
+            $command = self::DEFAULT;
+        }
+
+        if(empty($command)) {
+            return;
+        }
+
+        $this->commands[$command](Argument::new(), Writer::new());
     }
 
     private function close()
