@@ -11,6 +11,46 @@ class Writer {
     const COLOR_MAGENTA = 35;
     const COLOR_CYAN	= 36;
     const COLOR_WHITE	= 37;
+
+    private $prefix = "\033[";
+    private $reset = "0m";
+
+    private $tags = [        
+        // Style
+        'b'             => "1m",
+        'bold'          => "1m",
+        'dim'           => "2m",
+        'dim'           => "2m",
+        'i'             => "3m",
+        'italic'        => "3m",
+        'u'             => "4m",
+        'underline'     => "4m",
+        'blink'         => "5m",
+        'reverse'       => "7m",
+        'invisible'     => "8m",
+        's'             => "9m",
+        'strikethrough' => "9m",
+
+        // Colors
+        'black'         => "30m",
+        'red'           => "31m",
+        'green'         => "32m",
+        'yellow'        => "33m",
+        'blue'          => "34m",
+        'magenta'       => "35m",
+        'cyan'          => "36m",
+        'white'         => "37m",
+
+        // Background colors
+        'bg:black'      => "40m",
+        'bg:red'        => "41m",
+        'bg:green'      => "42m",
+        'bg:yellow'     => "43m",
+        'bg:blue'       => "44m",
+        'bg:magenta'    => "45m",
+        'bg:cyan'       => "46m",
+        'bg:white'      => "47m",
+    ];
     
     public function __construct() {}
 
@@ -19,75 +59,96 @@ class Writer {
         return new self();
     }
 
-    public function hideCursor()
+    private function parseTags($text)
     {
-        echo "\033[?25l";
-        
-        return $this;
+        $parts = preg_split('/(\[\/?.+?\])/', $text, -1, PREG_SPLIT_DELIM_CAPTURE);
+
+        $output = '';
+        $options = [];
+
+        foreach($parts as $part) {
+            // Check if part is text or tag
+            preg_match('/\[(\/?)(.+?)\]/', $part, $matches);
+
+            // Append text to output with styled options
+            if(empty($matches)) {
+
+                // First reset all styles
+                $output .= $this->prefix . $this->reset;
+
+                foreach($options as $option) {
+                    $option = strtolower($option);
+
+                    if(!isset($this->tags[$option])) {
+                        continue;
+                    }
+
+                    $output .= $this->prefix . $this->tags[$option];
+                }
+
+                $output .= $part;
+
+                continue;
+            }
+
+            // Option change
+            $is_opening = $matches[1] === '/' ? false : true;
+            $tag = $matches[2];
+
+            if(!isset($this->tags[$tag])) {
+                $output .= $part;
+                continue;
+            }
+
+            if($is_opening) {
+                $options[] = $tag;
+
+            } else {
+                $found = false;
+
+                // Remove tags from options list
+                for($i = sizeof($options) - 1; $i >= 0; $i--) {
+                    if($options[$i] === $tag) {
+                        array_splice($options, $i, 1);
+                        $found = true;
+                        break;
+                    }
+                }
+
+                // Show closing tag if no opening tag is found
+                if(!$found) {
+                    $output .= $part;
+                    continue;
+                }
+            }
+        }
+
+        return $output;
     }
 
-    public function showCursor()
-    {
-        echo "\033[?25h";
-
-        return $this;
-    }
-
-    private function cursorColor($color)
-    {
-        $value = $this->{$color};
-        echo "\033[{$value}m";
-    }
-
-    private function cursorBackground($color)
-    {
-        $value = $this->{$color};
-        $value = $value + 10;
-        echo "\033[{$value}m";
-    }
-
-    public function reset(): Writer
-    {
-        echo "\033[0m";
-
-        return $this;
-    }
-
-    private function parseOptions($options = [])
+    public function setStyle($options = []): Writer
     {
         $options = is_array($options) ? $options : [$options];
 
         foreach($options as $option) {
-            $option = strtoupper($option);
-
-            if(substr($option, 0, 3) === 'BG:') {
-                $option = substr($option, 3);
-                $value = constant('self::COLOR_' . $option);
-    
-                if(empty($value)) {
-                    continue;
-                }
-
-                $value += 10;
-    
-                echo "\033[{$value}m";
-
-            } else {
-                $value = constant('self::COLOR_' . $option);
-    
-                if(empty($value)) {
-                    continue;
-                }
-    
-                echo "\033[{$value}m";
+            if(isset($this->tags[$option])) {
+                echo $this->prefix . $this->tags[$option];
             }
-
         }
+        
+        return $this;
     }
 
-    public function line(string $value = '', $options = []): Writer
+    public function resetStyle(): Writer
     {
-        $this->parseOptions($options);
+        echo $this->prefix . $this->reset;
+
+        return $this;
+    }
+
+    public function line(string $value = ''): Writer
+    {
+        $value = $this->parseTags($value);
         echo $value . "\n";
 
         return $this;
@@ -95,7 +156,9 @@ class Writer {
 
     public function lines(array $lines = []): Writer
     {
-        echo implode("\n", $lines) . "\n";
+        foreach($lines as $line) {
+            $this->line($line);
+        }
 
         return $this;
     }

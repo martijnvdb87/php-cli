@@ -8,7 +8,6 @@ class Input {
     private $type;
     private $label;
     private $required = false;
-    private $label_options = [];
     private $input_options = [];
 
     public function __construct(string $label, string $type)
@@ -27,22 +26,6 @@ class Input {
         return new self($label, 'number');
     }
 
-    public function setLabelOption($options = []): Input
-    {
-        $options = is_array($options) ? $options : [$options];
-        $this->label_options = $options;
-
-        return $this;
-    }
-
-    public function setInputOption($options = []): Input
-    {
-        $options = is_array($options) ? $options : [$options];
-        $this->input_options = $options;
-
-        return $this;
-    }
-
     public function required(): Input
     {
         $this->required = true;
@@ -50,46 +33,40 @@ class Input {
         return $this;
     }
 
-    private function runText()
+    public function inputStyling($options = []): Input
     {
-        $writer = Writer::new()->line($this->label, $this->label_options)->reset();
-        
-        $handle = fopen('php://stdin', 'r');
-        $value = fgets($handle);
-        $value = trim($value);
+        $this->input_options = is_array($options) ? $options : [$options];
 
-        $writer->reset();
-
-        if($this->required) {
-            if(empty($value)) {
-                return $this->runText();
-            }
-        }
-        
-        return $value;
+        return $this;
     }
 
-    private function runNumber()
+    private function getInputValue()
     {
-        $writer = Writer::new()->line($this->label, $this->label_options)->reset();
-        
+        $writer = Writer::new()->setStyle($this->input_options);
+
         $handle = fopen('php://stdin', 'r');
         $value = fgets($handle);
-        $value = trim($value);
+        
+        $writer->resetStyle();
 
-        $writer->reset();
-
-        if($this->required) {
-            if(empty($value) || !is_numeric($value)) {
-                return $this->runNumber();
-            }
-        }
-
-        return $value;
+        return trim($value);
     }
 
     public function run()
     {
-        return $this->{'run' . ucfirst($this->type)}();
+        $writer = Writer::new()->line($this->label);
+        $value = $this->getInputValue();
+
+        if($this->required) {
+            if(empty($value)) {
+                return $this->run();
+            }
+            
+            if($this->type == 'number' && !is_numeric($value)) {
+                return $this->run();
+            }
+        }
+
+        return $value;
     }
 }

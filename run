@@ -16,30 +16,22 @@ $cli->addCommand(
         ->addOption('help', 'The name that should be printed.', 'h')
         ->addOption('version', 'The version of this application.', 'v')
         ->addAction(function($input, $output) {
-            $output->line('yay');
-            $output->lines([
-                'yay',
-                'xxx',
-            ]);
-            $output->lines([
-                'yay',
-                'xxx',
-            ]);
+            $output->line('Lorem ipsum [s]dolor sit[/s] amet, consectetur adipiscing elit.');
         })
 )
 ->addCommand(
     Command::new('test')
         ->addOption('name', 'The name that should be printed.', 'n')
         ->addAction(function($input, $output) {
-            $output->line($input->name, 'red');
-            $output->line($input->name, 'blue');
+            $output->line($input->name);
+            $output->line($input->name);
         })
 )
 ->addCommand(
     Command::new('test:input')
         ->addOption('name', 'The name that should be printed.', 'n')
         ->addAction(function($input, $output, $command) {
-            $name = $input->name ? $input->name : Input::text('What is your name?')->setLabelOption('yellow')->required()->run();
+            $name = $input->name ? $input->name : Input::text('[yellow]What is your name?[/yellow]')->inputStyling('red')->required()->run();
             $number = Input::number('Number?')->required()->run();
 
             $output->line($name);
