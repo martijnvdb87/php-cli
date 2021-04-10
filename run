@@ -8,21 +8,33 @@ require __DIR__.'/vendor/autoload.php';
 use Martijnvdb\PhpCli\Cli;
 use Martijnvdb\PhpCli\Input;
 
-$cli = new Cli('First CLI App', '');
+$cli = new Cli('First CLI App', '0.1.0');
 
 $cli->add(function($input, $output) {
-    if($input->get('-h', '--help')) {
-        $output->line('HELP');
+    if($input->get('-h', '--help') || empty($input->all())) {
+        return $output->version()
+            ->columns('Usage:', [
+                ['command [options] [arguments]']
+            ])
+            ->columns('Options:', [
+                ['-h, --help', 'Display this help message'],
+                ['-v, --version', 'Display this application version']
+            ], ['green'])
+            ->columns('Commands:', [
+                ['-h, --help', 'Display this help message'],
+                ['-v, --version', 'Display this application version']
+            ], ['green']);
     }
 
     if($input->get('-v', '--version')) {
-        $output->line('VERSION');
+        return $output->version();
     }
 
 })->add('test', function($input, $output) {
     $name = $input->get('-n', '--name');
 
-    $name = !empty($name) ? $name : Input::text('[yellow]What is your name?[/yellow]')->run();
+    $name = !empty($name) ? $name : Input::text('[yellow]What is your name?[/yellow]')->required()->get();
+    $number = Input::number('[yellow]What is your age?[/yellow]')->required()->get();
 
     $output->line("Lorem ipsum [bold][red]{$name}[/red][/bold] amet, consectetur adipiscing elit.");
     

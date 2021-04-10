@@ -2,9 +2,14 @@
 
 namespace Martijnvdb\PhpCli;
 
-class Writer {
+use Martijnvdb\PhpCli\Cli;
+
+class Output {
+    private $cli;
     private $prefix = "\033[";
     private $reset = "0m";
+
+    private $spacing = 2;
 
     private $tags = [        
         // Style
@@ -17,6 +22,7 @@ class Writer {
         'u'             => "4m",
         'underline'     => "4m",
         'blink'         => "5m",
+        'inverse'       => "7m",
         'reverse'       => "7m",
         'invisible'     => "8m",
         's'             => "9m",
@@ -43,11 +49,44 @@ class Writer {
         'bg:white'      => "47m",
     ];
     
-    public function __construct() {}
+    public function __construct(?Cli $cli = null) {
+        $this->cli = $cli;
+    }
 
-    public static function new()
+    public static function new(?Cli $cli = null): Output
     {
-        return new self();
+        return new self($cli);
+    }
+
+    public static function error(string $error, ?string $type = null): Output
+    {
+        return (new self())->showError($error, $type);
+    }
+
+    public function showError(string $error, ?string $type = null): Output
+    {
+        if($type === 'large') {
+            $space = str_repeat(' ', $this->spacing);
+            $length = strlen($error);
+            $block = str_repeat(' ', $length + ($this->spacing * 2));
+    
+            $this->lines([
+                "",
+                "[bg:red]{$block}[/bg:red]",
+                "[bg:red][white]{$space}{$error}{$space}[/white][/bg:red]",
+                "[bg:red]{$block}[/bg:red]",
+                ""
+            ]);
+            
+        } else {
+            $this->lines([
+                "",
+                "[bg:red][white]{$error}[/white][/bg:red]",
+                ""
+            ]);
+        }
+
+        return $this;
     }
 
     private function parseTags(string $text): string
@@ -117,7 +156,7 @@ class Writer {
         return $output;
     }
 
-    public function setStyle($options = []): Writer
+    public function setStyle($options = []): Output
     {
         $options = is_array($options) ? $options : [$options];
 
@@ -130,14 +169,32 @@ class Writer {
         return $this;
     }
 
-    public function resetStyle(): Writer
+    public function resetStyle(): Output
     {
         echo $this->prefix . $this->reset;
 
         return $this;
     }
 
-    public function line(string $value = ''): Writer
+    public function version(): Output
+    {
+        $name = $this->cli->getName();
+        $version = $this->cli->getVersion();
+
+        $this->line("{$name} [green]{$version}[/green]\n");
+
+        return $this;
+    }
+
+    public function paragraph(string $value = ''): Output
+    {
+        $value = $this->parseTags($value);
+        echo $value . "\n\n";
+
+        return $this;
+    }
+
+    public function line(string $value = ''): Output
     {
         $value = $this->parseTags($value);
         echo $value . "\n";
@@ -145,7 +202,7 @@ class Writer {
         return $this;
     }
 
-    public function lines(array $lines = []): Writer
+    public function lines(array $lines = []): Output
     {
         foreach($lines as $line) {
             $this->line($line);
@@ -154,17 +211,71 @@ class Writer {
         return $this;
     }
 
-    public function clearLine($value = ''): Writer
+    public function columns(string $label, array $rows = [], array $column_styles = []): Output
     {
-        echo "\033[0G"; // Move to begin of line
-        echo "\033[K"; // Clear current line
+        $column_lengths = [];
+
+        foreach($rows as $row) {
+            foreach($row as $index => $value) {
+                if(!isset($column_lengths[$index])) {
+                    $column_lengths[$index] = 0;
+                }
+
+                $length = strlen($value);
+
+                if($column_lengths[$index] < $length) {
+                    $column_lengths[$index] = $length;
+                }
+            }
+        }
+
+        $tags = [];
+        
+        foreach($column_styles as &$column_style) {
+            $column_style = is_array($column_style) ? $column_style : [$column_style];
+        }
+        
+        $this->line("[yellow]{$label}[/yellow]");
+        $indent = str_repeat(' ', $this->spacing);
+
+        foreach($rows as $row) {
+            $line = '';
+
+            foreach($row as $index => $value) {
+                $space = str_repeat(' ', ($column_lengths[$index] - strlen($value)));
+
+                if(isset($column_styles[$index])) {
+                    foreach($column_styles[$index] as $tag) {
+                        $line .= "[{$tag}]";
+                    }
+                }
+
+                $line .= "{$indent}{$value}{$space}";
+
+                if(isset($column_styles[$index])) {
+                    foreach($column_styles[$index] as $tag) {
+                        $line .= "[/{$tag}]";
+                    }
+                }
+            }
+
+            $this->line($line);
+        }
+        $this->line('');
+        
+        return $this;
+    }
+
+    public function sleep($seconds = 0): Output
+    {
+        sleep($seconds);
 
         return $this;
     }
 
-    public function sleep($seconds = 0): Writer
+    public function moveCursorUp($lines = 0): Output
     {
-        sleep($seconds);
+        echo "\033[{$lines}A";
 
         return $this;
     }

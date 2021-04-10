@@ -2,13 +2,16 @@
 
 namespace Martijnvdb\PhpCli;
 
-use Martijnvdb\PhpCli\Writer;
+use Martijnvdb\PhpCli\Output;
 
 class Input {
     private $type;
     private $label;
     private $required = false;
     private $input_options = [];
+
+    private $required_message = 'This value is required.';
+    private $invalid_message = 'This value is invalid.';
 
     public function __construct(string $label, string $type)
     {
@@ -26,10 +29,28 @@ class Input {
         return new self($label, 'number');
     }
 
-    public function required(): Input
+    public function required(?string $message = null): Input
     {
+        if(!empty($message)) {
+            $this->setRequiredMessage($message);
+        }
+
         $this->required = true;
 
+        return $this;
+    }
+
+    public function setRequiredMessage(string $message): Input
+    {
+        $this->required_message = $message;
+    
+        return $this;
+    }
+
+    public function setInvalidMessage(string $message): Input
+    {
+        $this->invalid_message = $message;
+    
         return $this;
     }
 
@@ -42,28 +63,30 @@ class Input {
 
     private function getInputValue()
     {
-        $writer = Writer::new()->setStyle($this->input_options);
+        $output = Output::new()->setStyle($this->input_options);
 
         $handle = fopen('php://stdin', 'r');
         $value = fgets($handle);
         
-        $writer->resetStyle();
+        $output->resetStyle();
 
         return trim($value);
     }
 
-    public function run()
+    public function get()
     {
-        $writer = Writer::new()->line($this->label);
+        $output = Output::new()->line($this->label);
         $value = $this->getInputValue();
 
         if($this->required) {
             if(empty($value)) {
-                return $this->run();
+                $output->moveCursorUp()->error($this->required_message);
+                return $this->get();
             }
             
             if($this->type == 'number' && !is_numeric($value)) {
-                return $this->run();
+                $output->error($this->invalid_message);
+                return $this->get();
             }
         }
 

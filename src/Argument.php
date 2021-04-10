@@ -2,11 +2,16 @@
 
 namespace Martijnvdb\PhpCli;
 
+use Martijnvdb\PhpCli\Cli;
+
 class Argument {
+    private $cli;
     private $arguments = [];
     
-    public function __construct() {
+    public function __construct(Cli $cli) {
         global $argv;
+
+        $this->cli = $cli;
 
         $arguments = [];
 
@@ -25,9 +30,9 @@ class Argument {
         $this->arguments = $arguments;
     }
 
-    public static function new()
+    public static function new(Cli $cli)
     {
-        return new self();
+        return new self($cli);
     }
 
     public function get()
@@ -42,5 +47,10 @@ class Argument {
         }
 
         return $value;
+    }
+
+    public function all()
+    {
+        return $this->arguments;
     }
 }

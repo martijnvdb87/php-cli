@@ -3,11 +3,14 @@
 namespace Martijnvdb\PhpCli;
 
 use Martijnvdb\PhpCli\Argument;
+use Martijnvdb\PhpCli\Output;
 
 class Cli {
     
-    protected $name;
-    protected $version;
+    private $name;
+    private $version;
+
+    private $error_message = 'Command "[command]" is not defined.';
 
     const DEFAULT = '__DEFAULT__';
 
@@ -17,6 +20,23 @@ class Cli {
     {
         $this->name = $name;
         $this->version = $version;
+    }
+
+    public function getName()
+    {
+        return $this->name;
+    }
+
+    public function getVersion()
+    {
+        return $this->version;
+    }
+
+    public function setErrorMessage(string $error): Cli
+    {
+        $this->error_message = $error_message;
+
+        return $this;
     }
 
     public function add(): Cli
@@ -44,33 +64,34 @@ class Cli {
     {
         global $argv;
 
-        $command = null;
+        $command = !empty($argv[1]) ? $argv[1] : null;
 
-        foreach($argv as $arg) {
-            // If options are found, stop searching for the command
-            if(substr($arg, 0, 1) === '-') {
-                break;
-            }
-
-            if(in_array($arg, array_keys($this->commands))) {
-                $command = $arg;
-                break;
-            }
+        if(substr($command, 0, 1) === '-') {
+            $command = null;
         }
 
         if(empty($command) && isset($this->commands[self::DEFAULT])) {
             $command = self::DEFAULT;
         }
 
+        if(!in_array($command, array_keys($this->commands))) {
+            $message = str_replace('[command]', $command, $this->error_message);
+
+            Output::new()->error($message, 'large');
+            return;
+        }
+
         if(empty($command)) {
             return;
         }
 
-        $this->commands[$command](Argument::new(), Writer::new());
+        $this->commands[$command](Argument::new($this), Output::new($this));
+
+        $this->close();
     }
 
     private function close()
     {
-        echo "\033[0A";
+        Output::new()->moveCursorUp();
     }
 }
