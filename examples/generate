@@ -31,7 +31,7 @@ $cli->add(function($input, $output) use ($cli) {
         }
 
         $value = Input::choice('[yellow]Select an option[/yellow] [green](1/2/3/4)[/green]:', [
-            "1" => 'Generate UIDs',
+            "1" => 'Generate UUIDs',
             "2" => 'Generate random Pokémon names',
             "3" => 'Show help',
             "4" => 'Show application version'
