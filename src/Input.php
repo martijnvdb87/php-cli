@@ -2,7 +2,8 @@
 
 namespace Martijnvdb\PhpCli;
 
-class Input {
+class Input
+{
     private $type;
     private $label;
     private $required = false;
@@ -38,7 +39,7 @@ class Input {
 
     public function required(?string $message = null): Input
     {
-        if(!empty($message)) {
+        if (!empty($message)) {
             $this->setRequiredMessage($message);
         }
 
@@ -50,21 +51,21 @@ class Input {
     public function setDefault($default): Input
     {
         $this->default = $default;
-    
+
         return $this;
     }
 
     public function setRequiredMessage(string $message): Input
     {
         $this->required_message = $message;
-    
+
         return $this;
     }
 
     public function setInvalidMessage(string $message): Input
     {
         $this->invalid_message = $message;
-    
+
         return $this;
     }
 
@@ -81,7 +82,7 @@ class Input {
 
         $handle = fopen('php://stdin', 'r');
         $value = fgets($handle);
-        
+
         $output->resetStyle();
 
         return trim($value);
@@ -91,17 +92,17 @@ class Input {
     {
         $output = Output::new();
 
-        if($this->type === 'choice') {
-            foreach($this->choices as $key => $value) {
+        if ($this->type === 'choice') {
+            foreach ($this->choices as $key => $value) {
                 $output->line("{$key}) {$value}");
             }
         }
-        
+
         $output->echo($this->label . " ");
 
         $value = $this->getInputValue();
 
-        if($value === '' && isset($this->default)) {
+        if ($value === '' && isset($this->default)) {
             $value = $this->default;
             $output->moveCursorUp();
             $output->echo("\033[2K");
@@ -113,24 +114,24 @@ class Input {
             $output->resetStyle();
         }
 
-        if($this->type === 'choice') {
-            $valid_options = array_map(function($option) {
+        if ($this->type === 'choice') {
+            $valid_options = array_map(function ($option) {
                 return strval($option);
             }, array_keys($this->choices));
 
-            if(!in_array($value, $valid_options)) {
+            if (!in_array($value, $valid_options)) {
                 $output->error($this->invalid_message);
                 return $this->get();
             }
         }
 
-        if($this->required) {
-            if(empty($value)) {
+        if ($this->required) {
+            if (empty($value)) {
                 $output->moveCursorUp()->error($this->required_message);
                 return $this->get();
             }
-            
-            if($this->type == 'number' && !is_numeric($value)) {
+
+            if ($this->type == 'number' && !is_numeric($value)) {
                 $output->error($this->invalid_message);
                 return $this->get();
             }

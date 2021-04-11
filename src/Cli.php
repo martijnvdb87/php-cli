@@ -2,8 +2,9 @@
 
 namespace Martijnvdb\PhpCli;
 
-class Cli {
-    
+class Cli
+{
+
     private $name;
     private $version;
 
@@ -31,7 +32,7 @@ class Cli {
 
     public function setErrorMessage(string $error): Cli
     {
-        $this->error_message = $error_message;
+        $this->error_message = $error;
 
         return $this;
     }
@@ -41,16 +42,15 @@ class Cli {
         $command = self::DEFAULT;
         $callback = null;
 
-        foreach(func_get_args() as $arg) {
-            if(is_callable($arg)) {
+        foreach (func_get_args() as $arg) {
+            if (is_callable($arg)) {
                 $callback = $arg;
-
-            } else if(is_string($arg)) {
+            } else if (is_string($arg)) {
                 $command = $arg;
             }
         }
 
-        if(isset($callback)) {
+        if (isset($callback)) {
             $this->commands[$command] = $callback;
         }
 
@@ -68,22 +68,22 @@ class Cli {
 
         $command = !empty($argv[1]) ? $argv[1] : null;
 
-        if(substr($command, 0, 1) === '-') {
+        if (substr($command, 0, 1) === '-') {
             $command = null;
         }
 
-        if(empty($command) && isset($this->commands[self::DEFAULT])) {
+        if (empty($command) && isset($this->commands[self::DEFAULT])) {
             $command = self::DEFAULT;
         }
 
-        if(!in_array($command, array_keys($this->commands))) {
+        if (!in_array($command, array_keys($this->commands))) {
             $message = str_replace('[command]', $command, $this->error_message);
 
             Output::new()->error($message, 'large');
             return;
         }
 
-        if(empty($command)) {
+        if (empty($command)) {
             return;
         }
 

@@ -2,16 +2,17 @@
 
 namespace Martijnvdb\PhpCli;
 
-class Argument {
+class Argument
+{
     private $cli;
     private $arguments = [];
-    
-    public function __construct(Cli $cli, array $arguments = []) {
+
+    public function __construct(Cli $cli, array $arguments = [])
+    {
         $this->cli = $cli;
 
-        if(empty($arguments)) {
+        if (empty($arguments)) {
             $this->getArguments();
-
         } else {
             $this->arguments = $arguments;
         }
@@ -23,14 +24,14 @@ class Argument {
 
         $arguments = [];
 
-        foreach($argv as $index => $arg) {
-            if(substr($arg, 0, 1) !== '-') {
+        foreach ($argv as $index => $arg) {
+            if (substr($arg, 0, 1) !== '-') {
                 continue;
             }
 
             $arguments[$arg] = true;
 
-            if(isset($argv[$index + 1]) && substr($argv[$index + 1], 0, 1) !== '-') {
+            if (isset($argv[$index + 1]) && substr($argv[$index + 1], 0, 1) !== '-') {
                 $arguments[$arg] = $argv[$index + 1];
             }
         }
@@ -47,8 +48,8 @@ class Argument {
     {
         $value = null;
 
-        foreach(func_get_args() as $arg) {
-            if(isset($this->arguments[$arg])) {
+        foreach (func_get_args() as $arg) {
+            if (isset($this->arguments[$arg])) {
                 $value = $this->arguments[$arg];
                 break;
             }

@@ -1,7 +1,7 @@
 #!/usr/bin/env php
 <?php
 
-if(php_sapi_name() !== 'cli') exit;
+if (php_sapi_name() !== 'cli') exit;
 
 require __DIR__ . '/../vendor/autoload.php';
 
@@ -10,52 +10,49 @@ use Martijnvdb\PhpCli\Input;
 
 $cli = new Cli('First CLI App', '0.1.0');
 
-$cli->add(function($input, $output) use ($cli) {
-        if($input->get('-h', '--help')) {
-            return $output->version()
-                ->columns('Usage:', [
-                    ['command [options] [arguments]']
-                ])
-                ->columns('Options:', [
-                    ['-h, --help', 'Display this help message'],
-                    ['-v, --version', 'Display this application version']
-                ], ['green'])
-                ->columns('Commands:', [
-                    ['uuid', 'Generate UUIDs (v4)'],
-                    ['pokemon', 'Generate random Pokémon names'],
-                ], ['green']);
-        }
+$cli->add(function ($input, $output) use ($cli) {
+    if ($input->get('-h', '--help')) {
+        return $output->version()
+            ->columns('Usage:', [
+                ['command [options] [arguments]']
+            ])
+            ->columns('Options:', [
+                ['-h, --help', 'Display this help message'],
+                ['-v, --version', 'Display this application version']
+            ], ['green'])
+            ->columns('Commands:', [
+                ['uuid', 'Generate UUIDs (v4)'],
+                ['pokemon', 'Generate random Pokémon names'],
+            ], ['green']);
+    }
 
-        if($input->get('-v', '--version')) {
-            return $output->version();
-        }
+    if ($input->get('-v', '--version')) {
+        return $output->version();
+    }
 
-        $value = Input::choice('[yellow]Select an option[/yellow] [green](1/2/3/4)[/green]:', [
-            "1" => 'Generate UUIDs',
-            "2" => 'Generate random Pokémon names',
-            "3" => 'Show help',
-            "4" => 'Show application version'
-        ])->setDefault(1)->get();
+    $value = Input::choice('[yellow]Select an option[/yellow] [green](1/2/3/4)[/green]:', [
+        "1" => 'Generate UUIDs',
+        "2" => 'Generate random Pokémon names',
+        "3" => 'Show help',
+        "4" => 'Show application version'
+    ])->setDefault(1)->get();
 
-        if($value === "1") {
-            $cli->forceRun('uuid');
+    if ($value === "1") {
+        $cli->forceRun('uuid');
+    } else if ($value === "2") {
+        $cli->forceRun('pokemon');
+    } else if ($value === "3") {
+        $cli->forceRun('__DEFAULT__', ['-h' => true]);
+    } else if ($value === "4") {
+        $cli->forceRun('__DEFAULT__', ['-v' => true]);
+    }
+})
 
-        } else if($value === "2") {
-            $cli->forceRun('pokemon');
-
-        } else if($value === "3") {
-            $cli->forceRun('__DEFAULT__', ['-h' => true]);
-
-        } else if($value === "4") {
-            $cli->forceRun('__DEFAULT__', ['-v' => true]);
-        }
-    })
-
-    ->add('uuid', function($input, $output) {
-        if($input->get('-h', '--help')) {
+    ->add('uuid', function ($input, $output) {
+        if ($input->get('-h', '--help')) {
             return $output->columns('Description:', [
-                    ['Generate UUIDs (v4)']
-                ])
+                ['Generate UUIDs (v4)']
+            ])
                 ->columns('Usage:', [
                     ['uuid [options] [arguments]']
                 ])
@@ -63,22 +60,22 @@ $cli->add(function($input, $output) use ($cli) {
                     ['-a, --amount', 'The amount of UUIDs that will be generated']
                 ], ['green']);
         }
-        
+
         $amount = $input->get('-a', '--amount');
 
         $amount = !empty($amount) ? $amount : Input::number('[yellow]How many UUIDs (v4) should be generated?[/yellow] [green](default: 10)[/green]:')->setDefault(10)->get();
 
-        for($i = 0; $i < $amount; $i++) {
+        for ($i = 0; $i < $amount; $i++) {
             $uuid = vsprintf('%s%s-%s-%s-%s-%s%s%s', str_split(bin2hex(random_bytes(16)), 4));
             $output->line($uuid);
         }
     })
 
-    ->add('pokemon', function($input, $output) {
-        if($input->get('-h', '--help')) {
+    ->add('pokemon', function ($input, $output) {
+        if ($input->get('-h', '--help')) {
             return $output->columns('Description:', [
-                    ['Generate random Pokémon names']
-                ])
+                ['Generate random Pokémon names']
+            ])
                 ->columns('Usage:', [
                     ['pokemon [options] [arguments]']
                 ])
@@ -86,33 +83,33 @@ $cli->add(function($input, $output) use ($cli) {
                     ['-a, --amount', 'The amount of Pokémon names that will generated']
                 ], ['green']);
         }
-        
+
         $amount = $input->get('-a', '--amount');
 
         $amount = !empty($amount) ? $amount : Input::number('[yellow]How many Pokémon names should be generated?[/yellow] [green](default: 1, max: 10)[/green]:')->setDefault(1)->get();
 
-        if($amount > 10) {
+        if ($amount > 10) {
             $amount = 10;
         }
 
         $pokemon = [];
 
-        for($i = 0; $i < $amount; $i++) {
+        for ($i = 0; $i < $amount; $i++) {
             $curl = curl_init();
 
             curl_setopt_array($curl, array(
                 CURLOPT_URL => "https://pokeapi.co/api/v2/pokemon/" . rand(1, 898),
                 CURLOPT_RETURNTRANSFER => true
             ));
-            
+
             $response = curl_exec($curl);
-            
+
             curl_close($curl);
             $data = json_decode($response);
 
             $types = [];
-            
-            foreach($data->types as $type) {
+
+            foreach ($data->types as $type) {
                 $types[] = $type->type->name;
             }
 

@@ -2,14 +2,15 @@
 
 namespace Martijnvdb\PhpCli;
 
-class Output {
+class Output
+{
     private $cli;
     private $prefix = "\033[";
     private $reset = "0m";
 
     private $spacing = 2;
 
-    private $tags = [        
+    private $tags = [
         // Style
         'b'             => "1m",
         'bold'          => "1m",
@@ -45,8 +46,9 @@ class Output {
         'bg:cyan'       => "46m",
         'bg:white'      => "47m",
     ];
-    
-    public function __construct(?Cli $cli = null) {
+
+    public function __construct(?Cli $cli = null)
+    {
         $this->cli = $cli;
     }
 
@@ -62,18 +64,17 @@ class Output {
 
     public function showError(string $error, ?string $type = null): Output
     {
-        if($type === 'large') {
+        if ($type === 'large') {
             $space = str_repeat('-', $this->spacing);
             $length = strlen($error);
             $block = str_repeat('-', $length + ($this->spacing * 2));
-    
+
             $this->lines([
                 "",
                 "[bg:red][invisible]{$block}[/invisible][/bg:red]",
                 "[bg:red][invisible]{$space}[/invisible][white]{$error}[/white][invisible]{$space}[/invisible][/bg:red]",
                 "[bg:red][invisible]{$block}[/invisible][/bg:red]"
             ]);
-            
         } else {
             $this->lines([
                 "",
@@ -92,20 +93,20 @@ class Output {
         $output = '';
         $options = [];
 
-        foreach($parts as $part) {
+        foreach ($parts as $part) {
             // Check if part is text or tag
             preg_match('/\[(\/?)(.+?)\]/', $part, $matches);
 
             // Append text to output with styled options
-            if(empty($matches)) {
+            if (empty($matches)) {
 
                 // First reset all styles
                 $output .= $this->prefix . $this->reset;
 
-                foreach($options as $option) {
+                foreach ($options as $option) {
                     $option = strtolower($option);
 
-                    if(!isset($this->tags[$option])) {
+                    if (!isset($this->tags[$option])) {
                         continue;
                     }
 
@@ -121,20 +122,19 @@ class Output {
             $is_opening = $matches[1] === '/' ? false : true;
             $tag = $matches[2];
 
-            if(!isset($this->tags[$tag])) {
+            if (!isset($this->tags[$tag])) {
                 $output .= $part;
                 continue;
             }
 
-            if($is_opening) {
+            if ($is_opening) {
                 $options[] = $tag;
-
             } else {
                 $found = false;
 
                 // Remove tags from options list
-                for($i = sizeof($options) - 1; $i >= 0; $i--) {
-                    if($options[$i] === $tag) {
+                for ($i = sizeof($options) - 1; $i >= 0; $i--) {
+                    if ($options[$i] === $tag) {
                         array_splice($options, $i, 1);
                         $found = true;
                         break;
@@ -142,7 +142,7 @@ class Output {
                 }
 
                 // Show closing tag if no opening tag is found
-                if(!$found) {
+                if (!$found) {
                     $output .= $part;
                     continue;
                 }
@@ -156,12 +156,12 @@ class Output {
     {
         $options = is_array($options) ? $options : [$options];
 
-        foreach($options as $option) {
-            if(isset($this->tags[$option])) {
+        foreach ($options as $option) {
+            if (isset($this->tags[$option])) {
                 echo $this->prefix . $this->tags[$option];
             }
         }
-        
+
         return $this;
     }
 
@@ -208,7 +208,7 @@ class Output {
 
     public function lines(array $lines = []): Output
     {
-        foreach($lines as $line) {
+        foreach ($lines as $line) {
             $this->line($line);
         }
 
@@ -219,50 +219,49 @@ class Output {
     {
         $column_lengths = [];
 
-        foreach($rows as $row) {
-            foreach($row as $index => $value) {
-                if(!isset($column_lengths[$index])) {
+        foreach ($rows as $row) {
+            foreach ($row as $index => $value) {
+                if (!isset($column_lengths[$index])) {
                     $column_lengths[$index] = 0;
                 }
 
                 $length = strlen($value);
 
-                if($column_lengths[$index] < $length) {
+                if ($column_lengths[$index] < $length) {
                     $column_lengths[$index] = $length;
                 }
             }
         }
 
         $tags = [];
-        
-        foreach($column_styles as &$column_style) {
-            if(empty($column_style)) {
-                $column_style = [];
 
+        foreach ($column_styles as &$column_style) {
+            if (empty($column_style)) {
+                $column_style = [];
             } else {
                 $column_style = is_array($column_style) ? $column_style : [$column_style];
             }
         }
-        
+
         $this->line("[yellow]{$label}[/yellow]");
         $indent = str_repeat(' ', $this->spacing);
 
-        foreach($rows as $row) {
+        foreach ($rows as $row) {
             $line = '';
 
-            foreach($row as $index => $value) {
+            foreach ($row as $index => $value) {
                 $space = str_repeat(' ', ($column_lengths[$index] - strlen($value)));
 
-                if(isset($column_styles[$index])) {
-                    foreach($column_styles[$index] as $tag) {
+                if (isset($column_styles[$index])) {
+                    foreach ($column_styles[$index] as $tag) {
                         $line .= "[{$tag}]";
                     }
                 }
 
                 $line .= "{$indent}{$value}{$space}";
 
-                if(isset($column_styles[$index])) {
-                    foreach($column_styles[$index] as $tag) {
+                if (isset($column_styles[$index])) {
+                    foreach ($column_styles[$index] as $tag) {
                         $line .= "[/{$tag}]";
                     }
                 }
@@ -271,7 +270,7 @@ class Output {
             $this->line($line);
         }
         $this->line('');
-        
+
         return $this;
     }
 
