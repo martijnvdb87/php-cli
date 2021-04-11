@@ -10,8 +10,8 @@ use Martijnvdb\PhpCli\Input;
 
 $cli = new Cli('First CLI App', '0.1.0');
 
-$cli->add(function($input, $output) {
-        if($input->get('-h', '--help') || empty($input->all())) {
+$cli->add(function($input, $output) use ($cli) {
+        if($input->get('-h', '--help')) {
             return $output->version()
                 ->columns('Usage:', [
                     ['command [options] [arguments]']
@@ -28,6 +28,26 @@ $cli->add(function($input, $output) {
 
         if($input->get('-v', '--version')) {
             return $output->version();
+        }
+
+        $value = Input::choice('[yellow]Select an option[/yellow] [green](1/2/3/4)[/green]:', [
+            "1" => 'Generate UIDs',
+            "2" => 'Generate random Pokémon names',
+            "3" => 'Show help',
+            "4" => 'Show application version'
+        ])->setDefault(1)->get();
+
+        if($value === "1") {
+            $cli->forceRun('uuid');
+
+        } else if($value === "2") {
+            $cli->forceRun('pokemon');
+
+        } else if($value === "3") {
+            $cli->forceRun('__DEFAULT__', ['-h' => true]);
+
+        } else if($value === "4") {
+            $cli->forceRun('__DEFAULT__', ['-v' => true]);
         }
     })
 
@@ -81,8 +101,8 @@ $cli->add(function($input, $output) {
             $curl = curl_init();
 
             curl_setopt_array($curl, array(
-              CURLOPT_URL => "https://pokeapi.co/api/v2/pokemon/" . rand(1, 898),
-              CURLOPT_RETURNTRANSFER => true
+                CURLOPT_URL => "https://pokeapi.co/api/v2/pokemon/" . rand(1, 898),
+                CURLOPT_RETURNTRANSFER => true
             ));
             
             $response = curl_exec($curl);
@@ -99,6 +119,6 @@ $cli->add(function($input, $output) {
             $pokemon[] = [$data->id, $data->name, implode(', ', $types)];
         }
 
-        $output->columns('Pokémon:', $pokemon, ['dim', 'white', 'yellow']);
+        $output->columns('Pokémon:', $pokemon, ['dim', null, 'yellow']);
     })
     ->run();

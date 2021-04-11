@@ -14,7 +14,6 @@ class Output {
         'b'             => "1m",
         'bold'          => "1m",
         'dim'           => "2m",
-        'dim'           => "2m",
         'i'             => "3m",
         'italic'        => "3m",
         'u'             => "4m",
@@ -64,16 +63,15 @@ class Output {
     public function showError(string $error, ?string $type = null): Output
     {
         if($type === 'large') {
-            $space = str_repeat(' ', $this->spacing);
+            $space = str_repeat('-', $this->spacing);
             $length = strlen($error);
-            $block = str_repeat(' ', $length + ($this->spacing * 2));
+            $block = str_repeat('-', $length + ($this->spacing * 2));
     
             $this->lines([
                 "",
-                "[bg:red]{$block}[/bg:red]",
-                "[bg:red][white]{$space}{$error}{$space}[/white][/bg:red]",
-                "[bg:red]{$block}[/bg:red]",
-                ""
+                "[bg:red][invisible]{$block}[/invisible][/bg:red]",
+                "[bg:red][invisible]{$space}[/invisible][white]{$error}[/white][invisible]{$space}[/invisible][/bg:red]",
+                "[bg:red][invisible]{$block}[/invisible][/bg:red]"
             ]);
             
         } else {
@@ -238,7 +236,12 @@ class Output {
         $tags = [];
         
         foreach($column_styles as &$column_style) {
-            $column_style = is_array($column_style) ? $column_style : [$column_style];
+            if(empty($column_style)) {
+                $column_style = [];
+
+            } else {
+                $column_style = is_array($column_style) ? $column_style : [$column_style];
+            }
         }
         
         $this->line("[yellow]{$label}[/yellow]");

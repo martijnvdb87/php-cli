@@ -8,6 +8,7 @@ class Input {
     private $required = false;
     private $default;
     private $input_options = [];
+    private $choices = [];
 
     private $required_message = 'This value is required.';
     private $invalid_message = 'This value is invalid.';
@@ -26,6 +27,13 @@ class Input {
     public static function number(string $label): Input
     {
         return new self($label, 'number');
+    }
+
+    public static function choice(string $label, array $choices): Input
+    {
+        $input = new self($label, 'choice');
+        $input->choices = $choices;
+        return $input;
     }
 
     public function required(?string $message = null): Input
@@ -81,13 +89,39 @@ class Input {
 
     public function get()
     {
-        $output = Output::new()->echo($this->label . " ");
+        $output = Output::new();
+
+        if($this->type === 'choice') {
+            foreach($this->choices as $key => $value) {
+                $output->line("{$key}) {$value}");
+            }
+        }
+        
+        $output->echo($this->label . " ");
+
         $value = $this->getInputValue();
 
-        if(empty($value) && !empty($this->default)) {
+        if($value === '' && isset($this->default)) {
             $value = $this->default;
             $output->moveCursorUp();
-            $output->line("[dim]{$this->default}[/dim]");
+            $output->echo("\033[2K");
+
+            $output->echo("{$this->label} ");
+
+            $output->setStyle($this->input_options);
+            echo "$this->default\n";
+            $output->resetStyle();
+        }
+
+        if($this->type === 'choice') {
+            $valid_options = array_map(function($option) {
+                return strval($option);
+            }, array_keys($this->choices));
+
+            if(!in_array($value, $valid_options)) {
+                $output->error($this->invalid_message);
+                return $this->get();
+            }
         }
 
         if($this->required) {

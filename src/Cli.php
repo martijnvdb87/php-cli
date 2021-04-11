@@ -57,6 +57,11 @@ class Cli {
         return $this;
     }
 
+    public function forceRun(string $command, array $args = []): void
+    {
+        $this->commands[$command](Argument::new($this, $args), Output::new($this));
+    }
+
     public function run(): void
     {
         global $argv;

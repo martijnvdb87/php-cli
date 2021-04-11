@@ -6,10 +6,20 @@ class Argument {
     private $cli;
     private $arguments = [];
     
-    public function __construct(Cli $cli) {
-        global $argv;
-
+    public function __construct(Cli $cli, array $arguments = []) {
         $this->cli = $cli;
+
+        if(empty($arguments)) {
+            $this->getArguments();
+
+        } else {
+            $this->arguments = $arguments;
+        }
+    }
+
+    private function getArguments(): void
+    {
+        global $argv;
 
         $arguments = [];
 
@@ -28,9 +38,9 @@ class Argument {
         $this->arguments = $arguments;
     }
 
-    public static function new(Cli $cli)
+    public static function new(Cli $cli, array $arguments = [])
     {
-        return new self($cli);
+        return new self($cli, $arguments);
     }
 
     public function get()
