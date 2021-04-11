@@ -2,9 +2,6 @@
 
 namespace Martijnvdb\PhpCli;
 
-use Martijnvdb\PhpCli\Argument;
-use Martijnvdb\PhpCli\Output;
-
 class Cli {
     
     private $name;

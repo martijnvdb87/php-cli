@@ -2,8 +2,6 @@
 
 namespace Martijnvdb\PhpCli;
 
-use Martijnvdb\PhpCli\Cli;
-
 class Output {
     private $cli;
     private $prefix = "\033[";
@@ -190,6 +188,14 @@ class Output {
     {
         $value = $this->parseTags($value);
         echo $value . "\n\n";
+
+        return $this;
+    }
+
+    public function echo(string $value = ''): Output
+    {
+        $value = $this->parseTags($value);
+        echo $value;
 
         return $this;
     }

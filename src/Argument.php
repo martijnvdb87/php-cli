@@ -2,8 +2,6 @@
 
 namespace Martijnvdb\PhpCli;
 
-use Martijnvdb\PhpCli\Cli;
-
 class Argument {
     private $cli;
     private $arguments = [];

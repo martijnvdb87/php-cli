@@ -2,12 +2,11 @@
 
 namespace Martijnvdb\PhpCli;
 
-use Martijnvdb\PhpCli\Output;
-
 class Input {
     private $type;
     private $label;
     private $required = false;
+    private $default;
     private $input_options = [];
 
     private $required_message = 'This value is required.';
@@ -37,6 +36,13 @@ class Input {
 
         $this->required = true;
 
+        return $this;
+    }
+
+    public function setDefault($default): Input
+    {
+        $this->default = $default;
+    
         return $this;
     }
 
@@ -75,8 +81,14 @@ class Input {
 
     public function get()
     {
-        $output = Output::new()->line($this->label);
+        $output = Output::new()->echo($this->label . " ");
         $value = $this->getInputValue();
+
+        if(empty($value) && !empty($this->default)) {
+            $value = $this->default;
+            $output->moveCursorUp();
+            $output->line("[dim]{$this->default}[/dim]");
+        }
 
         if($this->required) {
             if(empty($value)) {
