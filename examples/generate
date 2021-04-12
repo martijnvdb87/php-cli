@@ -10,8 +10,8 @@ use Martijnvdb\PhpCli\Input;
 
 $cli = new Cli('First CLI App', '0.1.0');
 
-$cli->add(function ($input, $output) use ($cli) {
-    if ($input->get('-h', '--help')) {
+$cli->add(function ($options, $output) use ($cli) {
+    if ($options->get('-h', '--help')) {
         return $output->version()
             ->columns('Usage:', [
                 ['command [options] [arguments]']
@@ -26,7 +26,7 @@ $cli->add(function ($input, $output) use ($cli) {
             ], ['green']);
     }
 
-    if ($input->get('-v', '--version')) {
+    if ($options->get('-v', '--version')) {
         return $output->version();
     }
 
@@ -48,8 +48,8 @@ $cli->add(function ($input, $output) use ($cli) {
     }
 })
 
-    ->add('uuid', function ($input, $output) {
-        if ($input->get('-h', '--help')) {
+    ->add('uuid', function ($options, $output) {
+        if ($options->get('-h', '--help')) {
             return $output->columns('Description:', [
                 ['Generate UUIDs (v4)']
             ])
@@ -61,7 +61,7 @@ $cli->add(function ($input, $output) use ($cli) {
                 ], ['green']);
         }
 
-        $amount = $input->get('-a', '--amount');
+        $amount = $options->get('-a', '--amount');
 
         $amount = !empty($amount) ? $amount : Input::number('[yellow]How many UUIDs (v4) should be generated?[/yellow] [green](default: 10)[/green]:')->setDefault(10)->get();
 
@@ -71,8 +71,8 @@ $cli->add(function ($input, $output) use ($cli) {
         }
     })
 
-    ->add('pokemon', function ($input, $output) {
-        if ($input->get('-h', '--help')) {
+    ->add('pokemon', function ($options, $output) {
+        if ($options->get('-h', '--help')) {
             return $output->columns('Description:', [
                 ['Generate random Pokémon names']
             ])
@@ -84,7 +84,7 @@ $cli->add(function ($input, $output) use ($cli) {
                 ], ['green']);
         }
 
-        $amount = $input->get('-a', '--amount');
+        $amount = $options->get('-a', '--amount');
 
         $amount = !empty($amount) ? $amount : Input::number('[yellow]How many Pokémon names should be generated?[/yellow] [green](default: 1, max: 10)[/green]:')->setDefault(1)->get();
 
