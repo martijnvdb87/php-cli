@@ -1,5 +1,5 @@
 # PHP CLI
-This library help you to create CLI applications quicky.
+This library helps you to create CLI applications quicky.
 
 ## Installation
 You can install the package via composer:
@@ -8,7 +8,7 @@ composer require martijnvdb/php-cli
 ```
 
 ## Usage
-Add the composer autoloader to your application and create a new instance of the CLI class. To run the application, use the `run()` method. In this example will be place this in a file called `myapp` (without the `.php` extension).
+Add the composer autoloader to your application and create a new instance of the CLI class. To run the application, use the `run()` method. This example will be placed in a file called `myapp` (without the `.php` extension).
 ```php
 require __DIR__ . '/vendor/autoload.php';
 
@@ -16,7 +16,7 @@ use Martijnvdb\PhpCli\Cli;
 
 $cli = new Cli('First CLI App', '0.1.0')->run();
 ```
-To add a default command to the application use the `add()` method. Use a callback function as the first argument. This callback will be called without giving any extra argument. To execute the script, run `php myapp`.
+To add a default command to the application use the `add()` method. Use a callback function as the first argument. This callback will be called without giving any extra arguments. To execute the script, run `php myapp`.
 ```php
 $cli = new Cli('First CLI App', '0.1.0');
 
@@ -25,7 +25,7 @@ $cli->add(function ($input, $output) {
 })
 ->run();
 ```
-The `add()` method can also be used to register a command to your application. The example will be executed by running `php myapp helloworld`.
+The `add()` method can also be used to register a command to your application. This example will be executed by running `php myapp helloworld`.
 ```php
 $cli = new Cli('First CLI App', '0.1.0');
 
@@ -85,7 +85,7 @@ These will change the background color of the text.
 The `$output` object contains the following methods:
 
 #### Basic text
-Four basis text output methods. The only difference between them is how the handle new lines.
+Four basis text output methods. The only difference between them is how they handle new lines.
 ```php
 $output->echo(string $value = '');
 $output->line(string $value = '');
@@ -108,7 +108,7 @@ $output->columns(string $label, array $rows = [], array $column_styles = []);
 Take a look at `examples/generate` to see some examples of how to use these methods.
 
 ## Input Helper Class
-This library also contains a helper class which allows the application to easy get a specific input of the user.
+This library also contains a helper class which allows the application to easily get a specific input of the user.
 
 ```php
 $input = Input::text(string $label)->get();
@@ -131,7 +131,7 @@ $input = Input::choice('[yellow]Select an option[/yellow] [green](1/2/3)[/green]
 ### Input methods
 
 #### Force the use to give an input
-If the given input is empty, then an required message will show up.
+If the given input is empty, then a required message will show up.
 ```php
 $input->required(string $message);
 ```

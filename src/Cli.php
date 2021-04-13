@@ -4,7 +4,6 @@ namespace Martijnvdb\PhpCli;
 
 class Cli
 {
-
     private $name;
     private $version;
 
