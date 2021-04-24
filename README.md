@@ -14,7 +14,7 @@ require __DIR__ . '/vendor/autoload.php';
 
 use Martijnvdb\PhpCli\Cli;
 
-$cli = new Cli('First CLI App', '0.1.0')->run();
+$cli = (new Cli('First CLI App', '0.1.0'))->run();
 ```
 To add a default command to the application use the `add()` method. Use a callback function as the first argument. This callback will be called without giving any extra arguments. To execute the script, run `php myapp`.
 ```php
