@@ -87,12 +87,5 @@ class Cli
         }
 
         $this->commands[$command](Argument::new($this), Output::new($this));
-
-        $this->close();
-    }
-
-    private function close()
-    {
-        Output::new()->moveCursorUp();
     }
 }

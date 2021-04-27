@@ -269,7 +269,6 @@ class Output
 
             $this->line($line);
         }
-        $this->line('');
 
         return $this;
     }
