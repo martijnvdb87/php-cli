@@ -30,6 +30,11 @@ class Input
         return new self($label, 'number');
     }
 
+    public static function url(string $label): Input
+    {
+        return new self($label, 'url');
+    }
+
     public static function choice(string $label, array $choices): Input
     {
         $input = new self($label, 'choice');
@@ -120,6 +125,13 @@ class Input
             }, array_keys($this->choices));
 
             if (!in_array($value, $valid_options)) {
+                $output->error($this->invalid_message);
+                return $this->get();
+            }
+        }
+
+        if ($this->type === 'url') {
+            if(!filter_var($value, FILTER_VALIDATE_URL)) {
                 $output->error($this->invalid_message);
                 return $this->get();
             }
