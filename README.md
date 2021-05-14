@@ -113,6 +113,8 @@ This library also contains a helper class which allows the application to easily
 ```php
 $input = Input::text(string $label)->get();
 $input = Input::number(string $label)->get();
+$input = Input::url(string $label)->get();
+$input = Input::email(string $label)->get();
 $input = Input::choice(string $label, array $options)->get();
 ```
 
