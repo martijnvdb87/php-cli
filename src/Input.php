@@ -35,6 +35,11 @@ class Input
         return new self($label, 'url');
     }
 
+    public static function email(string $label): Input
+    {
+        return new self($label, 'email');
+    }
+
     public static function choice(string $label, array $choices): Input
     {
         $input = new self($label, 'choice');
@@ -132,6 +137,13 @@ class Input
 
         if ($this->type === 'url') {
             if(!filter_var($value, FILTER_VALIDATE_URL)) {
+                $output->error($this->invalid_message);
+                return $this->get();
+            }
+        }
+
+        if ($this->type === 'email') {
+            if(!filter_var($value, FILTER_VALIDATE_EMAIL)) {
                 $output->error($this->invalid_message);
                 return $this->get();
             }
