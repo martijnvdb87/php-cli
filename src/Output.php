@@ -298,6 +298,13 @@ class Output
 
         return $this;
     }
+    
+    public function clearLine(): Output
+    {
+        echo "\033[K";
+
+        return $this;
+    }
 
     public function hideCursor(bool $hide_cursor = true): Output
     {
