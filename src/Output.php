@@ -49,6 +49,11 @@ class Output
 
     public function __construct(?Cli $cli = null)
     {
+        for($i = 0; $i <= 255; $i++) {
+            $this->tags[$i] = "38;5;{$i}m";
+            $this->tags["bg:$i"] = "48;5;{$i}m";
+        }
+        
         $this->cli = $cli;
     }
 
@@ -283,6 +288,25 @@ class Output
     public function moveCursorUp($lines = 0): Output
     {
         echo "\033[{$lines}A";
+
+        return $this;
+    }
+
+    public function moveCursorDown($lines = 0): Output
+    {
+        echo "\033[{$lines}B";
+
+        return $this;
+    }
+
+    public function hideCursor(bool $hide_cursor = true): Output
+    {
+        if($hide_cursor) {
+            echo "\033[?25l";
+            
+        } else {
+            echo "\033[?25h";
+        }
 
         return $this;
     }
