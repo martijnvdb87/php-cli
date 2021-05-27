@@ -7,6 +7,7 @@ require __DIR__ . '/../vendor/autoload.php';
 
 use Martijnvdb\PhpCli\Cli;
 use Martijnvdb\PhpCli\Input;
+use Martijnvdb\PhpCli\Progress;
 
 $cli = new Cli('First CLI App', '0.1.0');
 
@@ -23,6 +24,7 @@ $cli->add(function ($options, $output) use ($cli) {
             ->columns('Commands:', [
                 ['uuid', 'Generate UUIDs (v4)'],
                 ['pokemon', 'Generate random Pokémon names'],
+                ['progress', 'Progress bar demo'],
             ], ['green']);
     }
 
@@ -30,11 +32,12 @@ $cli->add(function ($options, $output) use ($cli) {
         return $output->version();
     }
 
-    $value = Input::choice('[yellow]Select an option[/yellow] [green](1/2/3/4)[/green]:', [
+    $value = Input::choice('[yellow]Select an option[/yellow] [green](1/2/3/4/5)[/green]:', [
         "1" => 'Generate UUIDs',
         "2" => 'Generate random Pokémon names',
-        "3" => 'Show help',
-        "4" => 'Show application version'
+        "3" => 'Progress bar demo',
+        "4" => 'Show help',
+        "5" => 'Show application version'
     ])->setDefault(1)->get();
 
     if ($value === "1") {
@@ -42,8 +45,10 @@ $cli->add(function ($options, $output) use ($cli) {
     } else if ($value === "2") {
         $cli->forceRun('pokemon');
     } else if ($value === "3") {
-        $cli->forceRun('__DEFAULT__', ['-h' => true]);
+        $cli->forceRun('progress');
     } else if ($value === "4") {
+        $cli->forceRun('__DEFAULT__', ['-h' => true]);
+    } else if ($value === "5") {
         $cli->forceRun('__DEFAULT__', ['-v' => true]);
     }
 })
@@ -117,5 +122,14 @@ $cli->add(function ($options, $output) use ($cli) {
         }
 
         $output->columns('Pokémon:', $pokemon, ['dim', null, 'yellow']);
+    })
+    
+    ->add('progress', function ($options, $output) {
+        $progress = Progress::new();
+
+        for($i = 0; $i <= 100; $i++) {
+            usleep(rand(1000, 500000));
+            $progress->set($i / 100);
+        }
     })
     ->run();
