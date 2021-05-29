@@ -74,14 +74,10 @@ class Progress
 
         if($this->in_progress) {
             $this->output->moveCursorUp();
-            $this->output->clearLine();
         }
 
+        $this->output->clearLine();
         $this->output->line($line);
-
-        if($this->in_progress) {
-            $this->output->moveCursorDown();
-        }
 
         $this->in_progress = true;
 

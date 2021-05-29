@@ -301,7 +301,7 @@ class Output
     
     public function clearLine(): Output
     {
-        echo "\033[K";
+        echo "\033[K\033[0G";
 
         return $this;
     }
