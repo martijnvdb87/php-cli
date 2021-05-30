@@ -11,18 +11,38 @@ class Progress
     private $in_progress = false;
     private $time_start = null;
 
+    private $template_foreground = "[bg:white][invisible]|[/invisible][/bg:white]";
+    private $template_background = "[bg:240][invisible].[/invisible][/bg:240]";
+
     private $size = 30;
 
     public function __construct()
     {
         $this->output = Output::new();
-        $this->time_start = time();
-        $this->update();
     }
 
     public static function new()
     {
         return new self;
+    }
+
+    public function foreground(string $template): self
+    {
+        $this->template_foreground = $template;
+        return $this;
+    }
+
+    public function background(string $template): self
+    {
+        $this->template_background = $template;
+        return $this;
+    }
+
+    public function start(): self
+    {
+        $this->time_start = time();
+        $this->update();
+        return $this;
     }
 
     public function set(float $current_progress): self
@@ -46,15 +66,12 @@ class Progress
     
     private function update(): self
     {
-        $current_block_template = "[bg:white][invisible]|[/invisible][/bg:white]";
-        $rest_block_template = "[bg:240][invisible].[/invisible][/bg:240]";
-
-        $current_percentage = ceil($this->current_progress * 100);
-        $current_blocks = ceil($this->size * $this->current_progress);
+        $current_percentage = floor($this->current_progress * 100);
+        $current_blocks = floor($this->size * $this->current_progress);
         $rest_blocks = $this->size - $current_blocks;
 
-        $line = str_repeat($current_block_template, $current_blocks);
-        $line .= str_repeat($rest_block_template, $rest_blocks);
+        $line = str_repeat($this->template_foreground, $current_blocks);
+        $line .= str_repeat($this->template_background, $rest_blocks);
         $line .= ' | ';
         $line .= ($this->current_progress == 0 ? ' ' : '') . ($this->current_progress < 1 ? ' ' : '') . $current_percentage . '%';
 
@@ -64,7 +81,7 @@ class Progress
             $line .= ' | ETA: ∞';
 
         } else if($this->current_progress === 1) {
-            $line .= ' | Finished';
+            $line .= '';
 
         } else {
             $line .= ' | ETA: ' . round($time_delta * (1 - $this->current_progress) / $this->current_progress) . 's';

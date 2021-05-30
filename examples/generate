@@ -125,7 +125,8 @@ $cli->add(function ($options, $output) use ($cli) {
     })
     
     ->add('progress', function ($options, $output) {
-        $progress = Progress::new();
+        $progress = Progress::new()
+            ->start();
 
         for($i = 0; $i <= 100; $i++) {
             usleep(rand(1000, 500000));
