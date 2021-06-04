@@ -155,3 +155,25 @@ The `$options` array can be filled with BB code tags without the brackets (eg. `
 ```php
 $input->inputStyling($options = []);
 ```
+
+## Progress Helper Class
+The Progress class shows a progressbar in the console. Using a float between `0` and `1` as an argument in the `set()` method, you can set the current percentage of the progressbar. The progressbar will also display how long it is running and the expected remaing time (ETA). The `start()` method will start the timer for those values. When the percentage reaches `1`, it will stop the progressbar.
+```php
+$progress = Progress::new();
+$progress->start();
+$progress->set(0.25);
+$progress->set(0.5);
+$progress->set(0.75);
+$progress->set(1);
+```
+
+### Progress Customization
+You can customize the look of the progressbar using the `size()`, `foreground()` and `background()` methods.
+```php
+// Default size
+$progress->size(30);
+
+// Default templates
+$progress->foreground('[bg:white][invisible]|[/invisible][/bg:white]');
+$progress->background('[bg:240][invisible].[/invisible][/bg:240]');
+```
