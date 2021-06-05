@@ -132,5 +132,7 @@ $cli->add(function ($options, $output) use ($cli) {
             usleep(rand(1000, 500000));
             $progress->set($i / 100);
         }
+
+        $progress->stop();
     })
     ->run();

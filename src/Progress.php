@@ -40,8 +40,9 @@ class Progress
 
     public function start(): self
     {
+        $this->in_progress = true;
         $this->time_start = time();
-        $this->update();
+        $this->update('started');
         return $this;
     }
 
@@ -55,6 +56,15 @@ class Progress
         return $this;
     }
 
+    public function stop(): self
+    {
+        if($this->in_progress) {
+            $this->in_progress = false;
+            $this->update('stopped');
+        }
+        return $this;
+    }
+
     public function size(int $size): self
     {
         $size = max(0, $size);
@@ -64,42 +74,38 @@ class Progress
         return $this;
     }
     
-    private function update(): self
+    private function update(string $action = ''): self
     {
-        $current_percentage = floor($this->current_progress * 100);
-        $current_blocks = floor($this->size * $this->current_progress);
-        $rest_blocks = $this->size - $current_blocks;
+        if($this->in_progress || !empty($action)) {
+            $current_percentage = floor($this->current_progress * 100);
+            $current_blocks = floor($this->size * $this->current_progress);
+            $rest_blocks = $this->size - $current_blocks;
+    
+            $line = str_repeat($this->template_foreground, $current_blocks);
+            $line .= str_repeat($this->template_background, $rest_blocks);
+            $line .= ' | ';
+            $line .= ($this->current_progress == 0 ? ' ' : '') . ($this->current_progress < 1 ? ' ' : '') . $current_percentage . '%';
 
-        $line = str_repeat($this->template_foreground, $current_blocks);
-        $line .= str_repeat($this->template_background, $rest_blocks);
-        $line .= ' | ';
-        $line .= ($this->current_progress == 0 ? ' ' : '') . ($this->current_progress < 1 ? ' ' : '') . $current_percentage . '%';
+            $time_delta = time() - $this->time_start;
+            
+            if($this->current_progress === 0) {
+                $line .= ' | ETA: ∞';
+    
+            } else if($action === 'stopped') {
+                $line .= '';
+    
+            } else {
+                $line .= ' | ETA: ' . round($time_delta * (1 - $this->current_progress) / $this->current_progress) . 's';
+            }
+            
+            $line .= ' | Total time: ' . round($time_delta) . 's';
+    
+            if($action !== 'started') {
+                $this->output->moveCursorUp();
+            }
 
-        $time_delta = time() - $this->time_start;
-        
-        if($this->current_progress === 0) {
-            $line .= ' | ETA: ∞';
-
-        } else if($this->current_progress === 1) {
-            $line .= '';
-
-        } else {
-            $line .= ' | ETA: ' . round($time_delta * (1 - $this->current_progress) / $this->current_progress) . 's';
-        }
-        
-        $line .= ' | Total time: ' . round($time_delta) . 's';
-
-        if($this->in_progress) {
-            $this->output->moveCursorUp();
-        }
-
-        $this->output->clearLine();
-        $this->output->line($line);
-
-        $this->in_progress = true;
-
-        if($this->current_progress >= 1) {
-            $this->in_progress = false;
+            $this->output->clearLine();
+            $this->output->line($line);
         }
 
         return $this;
