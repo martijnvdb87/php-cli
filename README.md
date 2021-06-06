@@ -157,7 +157,7 @@ $input->inputStyling($options = []);
 ```
 
 ## Progress Helper Class
-The Progress class shows a progressbar in the console. Using a float between `0` and `1` as an argument in the `set()` method, you can set the current percentage of the progressbar. The progressbar will also display how long it is running and the expected remaing time (ETA). The `start()` method will start the timer for those values. When the percentage reaches `1`, it will stop the progressbar.
+The Progress class shows a progressbar in the console. Using a float between `0` and `1` as an argument in the `set()` method, you can set the current percentage of the progressbar. The progressbar will also display how long it is running and the expected remaing time (ETA). The `start()` method will start the timer for those values. The `stop()` method will stop the timers and the progressbar.
 ```php
 $progress = Progress::new();
 $progress->start();
@@ -165,6 +165,7 @@ $progress->set(0.25);
 $progress->set(0.5);
 $progress->set(0.75);
 $progress->set(1);
+$progress->stop();
 ```
 
 ### Progress Customization
