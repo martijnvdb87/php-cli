@@ -1,7 +1,7 @@
 {
     "name": "martijnvdb/php-cli",
     "description": "Command line interface library for PHP",
-    "version": "0.2.0",
+    "version": "0.3.0",
     "type": "library",
     "keywords": [
         "cli"
